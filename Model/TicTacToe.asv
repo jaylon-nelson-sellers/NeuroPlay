@@ -18,7 +18,7 @@ classdef TicTacToe < Game
             disp(['Starting ', obj.gameName, ' with ', num2str(obj.numberOfPlayers), ' players.']);
             while true
                 % Players take turns
-                obj = obj.turn([1 -1]);
+                obj = obj.turn([1 2]);
 
                 % Check if the game is over
                 if obj.check_status() ~= 0 || obj.check_tie()
@@ -36,6 +36,7 @@ classdef TicTacToe < Game
 
                 if obj.check_status()
                     disp(['Player ', num2str(player), ' wins!']);
+
                 end
 
                 if obj.check_tie()
