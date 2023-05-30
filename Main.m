@@ -1,3 +1,3 @@
 Screen = Display();
 TTT = TicTacToe();
-TTT.start();
+TTT.human_bot_game();

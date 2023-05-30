@@ -3,12 +3,11 @@
 ## Understand and Implement Games
 Starting from least to most complex, the design for the board games will be created. A inheritable game object would be ideal.
 Games
-- Tic-Tac-Toe
-- Connect 4
-- Battleship
-- Gomoku
-- Chess
-- Risk
+- War
+- Takoyaki
+- Riichi Mahjong
+- Four in a Row
+- Nine Men's Morris
 
 ## Code using Model-View-Controller Pattern
 The code should have Low Coupling, High Cohesion. It should adhere to the model view controller pattern.

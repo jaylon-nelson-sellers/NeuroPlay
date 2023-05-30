@@ -1,96 +1,141 @@
 classdef TicTacToe < Game
-    % This is the TicTacToe subclass, which inherits from Game.
+    %TICTACTOE Summary of this class goes here
+    %   Detailed explanation goes here
 
     properties
-        board  % Initialize the game board
+
     end
 
     methods
         function obj = TicTacToe()
-            % Call the constructor of the base class:
-            obj = obj@Game('Tic Tac Toe', 2);
-            obj.board = zeros(3);  % Initialize the game board
+            board = zeros(3,3);
+            obj@Game("TicTacToe",2, board);
         end
 
-        function start(obj, players)
-            % Initialize the game
-            obj.board = zeros(3);
-            disp(['Starting ', obj.gameName, ' with ', num2str(obj.numberOfPlayers), ' players.']);
+        function winner = human_bot_game(obj )
             while true
-                % Players take turns
-                obj = obj.turn([1 -1]);
+                % Human Turn
+                while true
+                    row = input('Enter row: ');
+                    col = input('Enter column: ');
 
-                % Check if the game is over
-                if obj.check_status() ~= 0 || obj.check_tie()
-                    break;
+                    if (row == -1 || col == -1)
+                        disp("Exiting");
+                        return;
+                    end
+
+                    if (obj.check_valid(row,col))
+                         obj.board(row, col) = 1;
+                         break;
+                    else 
+                        fprintf('Invalid Move. Try again.\n');
+                        continue;
+                    end
                 end
-            end
-        end
+                    disp(obj.to_string);
 
-        function obj = turn(obj, players)
-            % This method could handle turn taking, alternating between players
-            for player = players
-                disp(['It is player ', num2str(player), ' turn.']);
-                obj = obj.move(player);
-                obj.to_string();
 
-                if obj.check_status()
-                    disp(['Player ', num2str(player), ' wins!']);
-                end
-
-                if obj.check_tie()
-                    disp('The game is a tie.');
-                    return;
-                end
-            end
-        end
-
-        function obj = move(obj, player)
-            % This method generates a random valid move for the current player
-            validMove = false;
-            while ~validMove
-                [row, col] = obj.random_move();
-                if obj.board(row, col) == 0
-                    obj.board(row, col) = player;
-                    validMove = true;
-                end
-            end
-        end
-
-        function winner = check_status(obj)
-            % This method checks the game status, i.e., whether there is a winner
-            lines = [-1, 0, 1];
-            for line = lines
-                diag1 = diag(obj.board, line);
-                diag2 = diag(flipud(obj.board), line);
-                checks = [sum(obj.board, 1), sum(obj.board, 2)', diag1', diag2'];
-                if any(checks == 3)
+                % Check if the player has won
+                if obj.check_win(obj.board, 1)
+                    fprintf('You win!\n');
                     winner = 1;
                     return;
-                elseif any(checks == -3)
+                end
+
+                % Check if the game is a tie
+                if obj.check_tie(obj.board)
+                    fprintf('The game is a tie.\n');
                     winner = -1;
                     return;
                 end
+
+                % Get the bot's move
+                fprintf('The bot is making a move...\n');
+                %temp random
+                [row, col] = obj.random_move();
+                obj.board(row, col) = 2;
+                % Check if the bot has won
+                if obj.check_win(obj.board, 2)
+                    fprintf('The bot wins!\n');
+                    winner = 2;
+                    return;
+                end
+
+                % Check if the game is a tie
+                if obj.check_tie(obj.board)
+                    fprintf('The game is a tie.\n');
+                    winner = -1;
+                end
+                disp(obj.to_string);
             end
-            winner = 0;
         end
 
-        function tie = check_tie(obj)
-            % This method checks if the game is a tie
-            tie = ~any(obj.board == 0, 'all');
+        function winner = bot_game(obj, bot_1, bot_2)
+
+        end
+
+        function complete = turn(obj, players)
+
+        end
+
+        function complete = move(obj, player)
+
+        end
+
+        function validity = check_valid(obj, row, col)
+             % Check if a move to the given position is valid
+            if row < 1 || row > 3 || col < 1 || col > 3
+                validity = false;
+            elseif obj.board(row, col) ~= 0
+                validity = false;
+            else
+                validity = true;
+            end
+        end
+
+        function game_status = check_win(obj, board, player)
+            % Check if the player has won
+            game_status = false;
+
+            % Check rows
+            if any(all(board == repmat(player, 3, 1), 2))
+                game_status = true;
+                return;
+            end
+
+            % Check columns
+            if any(all(board == repmat(player, 1, 3), 1))
+                game_status = true;
+                return;
+            end
+
+            % Check diagonals
+            if all(diag(board) == player) || all(diag(fliplr(board)) == player)
+                game_status = true;
+                return;
+            end
+        end
+
+        function game_status = check_tie(obj, board)
+            game_status = all(board(:) ~= 0);
         end
 
         function [row, col] = random_move(obj)
-            % This method generates a random valid move
-            [rows, cols] = find(obj.board == 0);
-            idx = randi(length(rows));
-            row = rows(idx);
-            col = cols(idx);
+            % Generate a random valid move
+            valid = false;
+            while ~valid
+                 % Generate a random valid move
+                [valid_rows, valid_cols] = find(obj.board == 0);
+                idx = randi(length(valid_rows));
+                row = valid_rows(idx);
+                col = valid_cols(idx);
+                valid = obj.check_valid(row, col);
+            end
         end
 
-        function to_string(obj)
-            % This method prints the game board
-            disp(obj.board);
+        function string = to_string(obj)
+            string = obj.board;
         end
     end
 end
+
