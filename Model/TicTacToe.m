@@ -12,63 +12,65 @@ classdef TicTacToe < Game
             obj@Game("TicTacToe",2, board);
         end
 
-        function winner = human_bot_game(obj )
-            while true
-                % Human Turn
-                while true
-                    row = input('Enter row: ');
-                    col = input('Enter column: ');
+        function winner = human_bot_game(obj)
+            % Initialize winner
+            winner = 0;
+            while winner == 0
+                % Get the human player's move
+                [row, col] = obj.get_human_move();
 
-                    if (row == -1 || col == -1)
-                        disp("Exiting");
-                        return;
-                    end
-
-                    if (obj.check_valid(row,col))
-                         obj.board(row, col) = 1;
-                         break;
-                    else 
-                        fprintf('Invalid Move. Try again.\n');
-                        continue;
-                    end
-                end
-                    disp(obj.to_string);
-
-
-                % Check if the player has won
-                if obj.check_win(obj.board, 1)
-                    fprintf('You win!\n');
-                    winner = 1;
+                % Check if the player decided to quit the game
+                if row == -1 || col == -1
+                    disp("Exiting");
                     return;
                 end
 
-                % Check if the game is a tie
-                if obj.check_tie(obj.board)
-                    fprintf('The game is a tie.\n');
-                    winner = -1;
-                    return;
+                % Update the board with the human player's move
+                obj.board(row, col) = 1;
+                disp(obj.to_string());
+
+                % Check game status
+                winner = obj.check_game_status(1);
+                if winner ~= 0
+                    break;
                 end
 
-                % Get the bot's move
+                % Bot's turn
                 fprintf('The bot is making a move...\n');
-                %temp random
                 [row, col] = obj.random_move();
                 obj.board(row, col) = 2;
-                % Check if the bot has won
-                if obj.check_win(obj.board, 2)
-                    fprintf('The bot wins!\n');
-                    winner = 2;
-                    return;
-                end
+                disp(obj.to_string());
 
-                % Check if the game is a tie
-                if obj.check_tie(obj.board)
-                    fprintf('The game is a tie.\n');
-                    winner = -1;
-                end
-                disp(obj.to_string);
+                % Check game status
+                winner = obj.check_game_status(2);
             end
         end
+
+        function [row, col] = get_human_move(obj)
+            while true
+                row = input('Enter row: ');
+                col = input('Enter column: ');
+
+                if row == -1 || col == -1 || obj.check_valid(row, col)
+                    break;
+                end
+
+                fprintf('Invalid Move. Try again.\n');
+            end
+        end
+
+        function winner = check_game_status(obj, player)
+            if obj.check_win(obj.board, player)
+                fprintf(['Player ', num2str(player), ' wins!\n']);
+                winner = player;
+            elseif obj.check_tie(obj.board)
+                fprintf('The game is a tie.\n');
+                winner = -1;
+            else
+                winner = 0;
+            end
+        end
+
 
         function winner = bot_game(obj, bot_1, bot_2)
 
@@ -83,7 +85,7 @@ classdef TicTacToe < Game
         end
 
         function validity = check_valid(obj, row, col)
-             % Check if a move to the given position is valid
+            % Check if a move to the given position is valid
             if row < 1 || row > 3 || col < 1 || col > 3
                 validity = false;
             elseif obj.board(row, col) ~= 0
@@ -124,7 +126,7 @@ classdef TicTacToe < Game
             % Generate a random valid move
             valid = false;
             while ~valid
-                 % Generate a random valid move
+                % Generate a random valid move
                 [valid_rows, valid_cols] = find(obj.board == 0);
                 idx = randi(length(valid_rows));
                 row = valid_rows(idx);
